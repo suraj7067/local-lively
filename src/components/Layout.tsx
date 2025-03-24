@@ -59,7 +59,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         exit="exit"
         variants={variants}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="container px-4 sm:px-6 mx-auto pt-20 pb-16"
+        className="container px-4 sm:px-6 mx-auto pt-20 pb-16 font-sans"
       >
         {children}
       </motion.main>
