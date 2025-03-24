@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X, Search, MapPin, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Logo from './Logo';
 
 const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,9 +38,7 @@ const Navigation: React.FC = () => {
       }`}
     >
       <div className="container mx-auto flex items-center justify-between">
-        <Link to="/" className="flex items-center z-10">
-          <span className="font-bold text-xl tracking-tight">Spot<span className="text-primary">Me</span></span>
-        </Link>
+        <Logo className="z-10" />
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
