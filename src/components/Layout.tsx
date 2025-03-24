@@ -10,7 +10,14 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const location = useLocation();
+  // We'll use a try-catch to safely use useLocation and provide a fallback
+  let location;
+  try {
+    location = useLocation();
+  } catch (error) {
+    // If useLocation fails, we'll use a default value
+    location = { pathname: '/' };
+  }
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
