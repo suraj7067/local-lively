@@ -18,7 +18,7 @@ const Logo: React.FC<LogoProps> = ({ variant = 'default', className = '' }) => {
     <Link to="/" className={`inline-block ${className}`}>
       <img 
         src={logoSrc} 
-        alt="SpotVibe Logo" 
+        alt="SpotMe Logo" 
         className="h-8 sm:h-10"
         onError={(e) => {
           console.error("Logo failed to load:", e);
@@ -27,7 +27,7 @@ const Logo: React.FC<LogoProps> = ({ variant = 'default', className = '' }) => {
           target.style.display = 'none';
           target.parentElement?.insertAdjacentHTML(
             'beforeend', 
-            '<span class="font-bold text-xl tracking-tight">Spot<span class="text-primary">Vibe</span></span>'
+            '<span class="font-bold text-xl tracking-tight">Spot<span class="text-primary">Me</span></span>'
           );
         }}
       />
