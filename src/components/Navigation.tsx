@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, Search, MapPin, User, LogOut } from 'lucide-react';
+import { Menu, X, Search, MapPin, User, LogOut, Plus, Ticket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Logo from './Logo';
 import { useAuth } from '@/contexts/AuthContext';
+import NotificationCenter from './NotificationCenter';
 
 const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,8 +38,8 @@ const Navigation: React.FC = () => {
 
   const navItems = [
     { name: 'Events', path: '/' },
-    { name: 'VibeRadar', path: '/viberadar' },
-    { name: 'My Tickets', path: '/tickets' },
+    { name: 'Create Event', path: '/create-event', authRequired: true },
+    { name: 'My Tickets', path: '/tickets', authRequired: true },
   ];
 
   const getInitials = (name: string) => {
@@ -60,19 +61,21 @@ const Navigation: React.FC = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              to={item.path}
-              className={`py-2 px-3 rounded-md text-sm font-medium transition-colors ${
-                location.pathname === item.path
-                  ? 'text-primary'
-                  : 'text-foreground/80 hover:text-foreground hover:bg-accent/50'
-              }`}
-            >
-              {item.name}
-            </Link>
-          ))}
+          {navItems
+            .filter(item => !item.authRequired || user)
+            .map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                  location.pathname === item.path
+                    ? 'text-primary'
+                    : 'text-foreground/80 hover:text-foreground hover:bg-accent/50'
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
         </nav>
 
         <div className="hidden md:flex items-center space-x-3 z-10">
@@ -82,6 +85,8 @@ const Navigation: React.FC = () => {
           <Button variant="ghost" size="icon" className="text-foreground/80 hover:text-foreground">
             <MapPin size={20} />
           </Button>
+          
+          {user && <NotificationCenter />}
           
           {user ? (
             <DropdownMenu>
@@ -105,6 +110,18 @@ const Navigation: React.FC = () => {
                   <Link to="/profile" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/tickets" className="cursor-pointer">
+                    <Ticket className="mr-2 h-4 w-4" />
+                    <span>My Tickets</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/create-event" className="cursor-pointer">
+                    <Plus className="mr-2 h-4 w-4" />
+                    <span>Create Event</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -148,19 +165,21 @@ const Navigation: React.FC = () => {
             className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-md border-b border-border"
           >
             <div className="container mx-auto py-4 px-4 sm:px-6 space-y-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className={`block py-3 px-4 rounded-lg ${
-                    location.pathname === item.path
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-foreground hover:bg-accent/50'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
+              {navItems
+                .filter(item => !item.authRequired || user)
+                .map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className={`block py-3 px-4 rounded-lg ${
+                      location.pathname === item.path
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-foreground hover:bg-accent/50'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
               
               {user && (
                 <Link
