@@ -2,14 +2,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, Search, MapPin, User } from 'lucide-react';
+import { Menu, X, Search, MapPin, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 import Logo from './Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const { user, profile, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +40,14 @@ const Navigation: React.FC = () => {
     { name: 'VibeRadar', path: '/viberadar' },
     { name: 'My Tickets', path: '/tickets' },
   ];
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
+  };
 
   return (
     <header 
@@ -64,11 +82,48 @@ const Navigation: React.FC = () => {
           <Button variant="ghost" size="icon" className="text-foreground/80 hover:text-foreground">
             <MapPin size={20} />
           </Button>
-          <Link to="/auth">
-            <Button variant="outline" className="ml-2 button-hover">
-              Sign In
-            </Button>
-          </Link>
+          
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={profile?.avatar_url} alt={profile?.full_name || "User"} />
+                    <AvatarFallback>
+                      {profile?.full_name ? getInitials(profile.full_name) : <User size={16} />}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <div className="flex flex-col space-y-1 p-2">
+                  <p className="text-sm font-medium">{profile?.full_name || "SpotMe User"}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  className="text-red-500 focus:text-red-500 cursor-pointer"
+                  onClick={() => signOut()}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/auth">
+              <Button variant="outline" className="ml-2 button-hover">
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -106,17 +161,39 @@ const Navigation: React.FC = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              {user && (
+                <Link
+                  to="/profile"
+                  className={`block py-3 px-4 rounded-lg ${
+                    location.pathname === '/profile'
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-foreground hover:bg-accent/50'
+                  }`}
+                >
+                  My Profile
+                </Link>
+              )}
+              
               <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
                 <Button variant="outline" size="sm" className="w-full">
                   <Search size={16} className="mr-2" />
                   Search
                 </Button>
-                <Link to="/auth" className="w-full ml-2">
-                  <Button className="w-full">
-                    <User size={16} className="mr-2" />
-                    Sign In
+                
+                {user ? (
+                  <Button variant="outline" size="sm" className="w-full ml-2" onClick={() => signOut()}>
+                    <LogOut size={16} className="mr-2" />
+                    Sign Out
                   </Button>
-                </Link>
+                ) : (
+                  <Link to="/auth" className="w-full ml-2">
+                    <Button className="w-full">
+                      <User size={16} className="mr-2" />
+                      Sign In
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>
