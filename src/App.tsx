@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import CreateEvent from "./pages/CreateEvent";
 import Tickets from "./pages/Tickets";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import React from 'react';
 
 // Create a new QueryClient instance outside of the component
@@ -39,9 +40,9 @@ const App = () => {
                     </ProtectedRoute>
                   } />
                   <Route path="/create-event" element={
-                    <ProtectedRoute>
+                    <AdminRoute>
                       <CreateEvent />
-                    </ProtectedRoute>
+                    </AdminRoute>
                   } />
                   <Route path="/tickets" element={
                     <ProtectedRoute>

@@ -20,7 +20,7 @@ const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, isAdmin, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,12 +36,6 @@ const Navigation: React.FC = () => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  const navItems = [
-    { name: 'Events', path: '/' },
-    { name: 'Create Event', path: '/create-event', authRequired: true },
-    { name: 'My Tickets', path: '/tickets', authRequired: true },
-  ];
-
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -49,6 +43,31 @@ const Navigation: React.FC = () => {
       .join('')
       .toUpperCase();
   };
+
+  // Create nav items based on user role
+  const getNavItems = () => {
+    const baseItems = [
+      { name: 'Events', path: '/' },
+    ];
+    
+    const userItems = [
+      { name: 'My Tickets', path: '/tickets', authRequired: true },
+    ];
+    
+    const adminItems = [
+      { name: 'Create Event', path: '/create-event', adminRequired: true },
+    ];
+    
+    let items = [...baseItems, ...userItems];
+    
+    if (isAdmin) {
+      items = [...items, ...adminItems];
+    }
+    
+    return items;
+  };
+  
+  const navItems = getNavItems();
 
   return (
     <header 
@@ -62,7 +81,11 @@ const Navigation: React.FC = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
           {navItems
-            .filter(item => !item.authRequired || user)
+            .filter(item => 
+              (!item.authRequired && !item.adminRequired) || 
+              (item.authRequired && user) || 
+              (item.adminRequired && isAdmin)
+            )
             .map((item) => (
               <Link
                 key={item.name}
@@ -104,6 +127,9 @@ const Navigation: React.FC = () => {
                 <div className="flex flex-col space-y-1 p-2">
                   <p className="text-sm font-medium">{profile?.full_name || "SpotMe User"}</p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
+                  {isAdmin && (
+                    <span className="text-xs font-semibold text-primary">Administrator</span>
+                  )}
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
@@ -118,12 +144,14 @@ const Navigation: React.FC = () => {
                     <span>My Tickets</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/create-event" className="cursor-pointer">
-                    <Plus className="mr-2 h-4 w-4" />
-                    <span>Create Event</span>
-                  </Link>
-                </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/create-event" className="cursor-pointer">
+                      <Plus className="mr-2 h-4 w-4" />
+                      <span>Create Event</span>
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   className="text-red-500 focus:text-red-500 cursor-pointer"
@@ -166,7 +194,11 @@ const Navigation: React.FC = () => {
           >
             <div className="container mx-auto py-4 px-4 sm:px-6 space-y-2">
               {navItems
-                .filter(item => !item.authRequired || user)
+                .filter(item => 
+                  (!item.authRequired && !item.adminRequired) || 
+                  (item.authRequired && user) || 
+                  (item.adminRequired && isAdmin)
+                )
                 .map((item) => (
                   <Link
                     key={item.name}
